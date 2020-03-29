@@ -8,10 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+//@Document
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +17,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Product {
 
   @EqualsAndHashCode.Exclude
-  @Id
   private String id;
 
   @NotBlank(message = "'title' is required")

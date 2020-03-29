@@ -2,15 +2,20 @@ package dev.iseif.reactiverestapi.service;
 
 import dev.iseif.reactiverestapi.model.Product;
 import dev.iseif.reactiverestapi.repository.ProductRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class ProductService {
+	
+  @Autowired 
+  private ProductRepository productRepository;
 
-  private final ProductRepository productRepository;
-
+ 
   public ProductService(ProductRepository productRepository) {
     this.productRepository = productRepository;
   }
