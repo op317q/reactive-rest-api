@@ -1,11 +1,12 @@
 package dev.iseif.reactiverestapi.repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Repository;
 
+import dev.iseif.reactiverestapi.model.Customer;
 import dev.iseif.reactiverestapi.model.Product;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,10 +50,13 @@ public class ProductRepoImpl implements ProductRepository {
 
 	
 	@Override
-	public Flux<Product> findAll() {
+	public  Mono<List<Product>> findAll() {
 		// TODO Auto-generated method stub
 		System.out.println(this.productMap.values());
-		return Flux.fromIterable(this.productMap.values());
+		List<Product> prodList=new ArrayList<Product>();
+		prodList.addAll(this.productMap.values());
+		return Mono.just(prodList);
+		
 	}
 
 

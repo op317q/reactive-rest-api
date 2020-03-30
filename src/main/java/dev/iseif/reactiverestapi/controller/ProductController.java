@@ -3,6 +3,8 @@ package dev.iseif.reactiverestapi.controller;
 import dev.iseif.reactiverestapi.model.Product;
 import dev.iseif.reactiverestapi.service.ProductService;
 import java.net.URI;
+import java.util.List;
+
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +30,7 @@ public class ProductController {
   }
 
   @GetMapping
-  public Flux<Product> getAllProducts() {
+  public Mono<List<Product>> getAllProducts() {
     return productService.getAll();
   }
 

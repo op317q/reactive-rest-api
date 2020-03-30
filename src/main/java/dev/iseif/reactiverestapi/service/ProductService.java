@@ -3,6 +3,8 @@ package dev.iseif.reactiverestapi.service;
 import dev.iseif.reactiverestapi.model.Product;
 import dev.iseif.reactiverestapi.repository.ProductRepository;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ public class ProductService {
     this.productRepository = productRepository;
   }
 
-  public Flux<Product> getAll() {
+  public Mono<List<Product>> getAll() {
     return productRepository.findAll();
   }
 
