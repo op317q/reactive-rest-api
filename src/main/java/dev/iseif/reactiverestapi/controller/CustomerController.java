@@ -123,15 +123,72 @@ private boolean isProduct(String productID, Product product) {
 }
 
 @GetMapping("{id}")
-  public Mono<ResponseEntity<Customer>> getCustomerById(@PathVariable String id) {
-    return customerService.getById(id)
-        .map(ResponseEntity::ok)
-        .defaultIfEmpty(ResponseEntity.notFound().build());
+  public Mono<Object> getCustomerById(@PathVariable String id) {
+	
+	Mono<Customer> customerMono= customerService.getById(id);
+	
+	Mono<List<Product>> productAll = productService.getAll();
+	
+	 Mono<Tuple2<Customer, List<Product>>> zip = Mono.zip(customerMono, productAll );
+	
+	Mono<Object> res = zip.map(t -> populateCustomer(t.getT1(),t.getT2()));
+	return res;
+	
+    //return customerService.getById(id)
+      //  .map(ResponseEntity::ok)
+        //.defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   
 
-  @PostMapping
+  
+
+private Object populateCustomer(Customer customer,List<Product> productList) {
+	// TODO Auto-generated method stub
+	System.out.println("inside iterateCustomer customer="+customer);
+	
+	CustomerProduct customerProduct =new CustomerProduct();
+	customerProduct.setCustomerId(customer.getCustomerId());
+	customerProduct.setAddress(customer.getAddress());
+	customerProduct.setCustomerName(customer.getCustomerName());
+	List<Product> custProductList =new ArrayList<Product>();
+	List<CustomerProduct> customerProductList =new ArrayList<CustomerProduct>();
+	
+	Iterator<String> iter = customer.getProductIdList().iterator();  
+    while (iter.hasNext()) {
+    	String productID=iter.next();
+    	System.out.println("productID="+productID);
+    	System.out.println("productList="+productList);
+    	
+    	{
+    	  Iterator<Product> productIter = productList.iterator();
+   		  while (productIter.hasNext()) {
+   			Product product=productIter.next();
+   			if(isProduct(productID, product)) {
+   				custProductList.add(product);
+   			}  
+   		  }
+   		
+    	}
+    	
+    } 
+    
+    
+    
+    System.out.println("custProductList=="+custProductList);
+    customerProduct.setProductList(custProductList);
+    
+    
+    CustomerInfo info = new CustomerInfo();
+    customerProductList.add(customerProduct);
+	info.setCustomerProductList(customerProductList);
+    
+    
+	  return info;
+	
+}
+
+@PostMapping
   public Mono<ResponseEntity<Customer>> createCustomer(@RequestBody @Valid Customer customer) {
 	 Customer customerToCreate = customer.toBuilder().customerId(null).build();
     return customerService.create(customerToCreate)
