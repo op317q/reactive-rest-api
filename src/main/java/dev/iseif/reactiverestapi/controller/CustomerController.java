@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 @RestController
@@ -42,14 +43,25 @@ public class CustomerController {
   @GetMapping
   public Mono<Object> getAllCustomer() {
     //return customerService.getAll();
-	  Mono<List<Customer>> customerAll = customerService.getAll();
-	  Mono<List<Product>> productAll = productService.getAll();
+	  Mono<List<Product>> productAll = productService.getAll();//.subscribeOn(Schedulers.elastic());
+	  System.out.println("product call is done");
+	  Mono<List<Customer>> customerAll = customerService.getAll();//.subscribeOn(Schedulers.elastic());
+	  System.out.println("customer call is done");
 	  
-	  Mono<Tuple2<List<Customer>, List<Product>>> zip = Mono.zip(customerAll, productAll );
 	  
+	 Mono<Tuple2<List<Customer>, List<Product>>> zip = Mono.zip(customerAll, productAll );
+	  System.out.println("zip call is done");
+	  
+	  long t1= System.currentTimeMillis();
 	  Mono<Object> res = zip.map(t -> populate(t.getT1(),t.getT2()));
+	  System.out.println("time take to complete the zip.map ="+(System.currentTimeMillis()-t1));
+	   //return customerAll.zipWith(productAll,(a,b) -> populate(a,b));
 	  
-	  return res;
+	  //return zip.flatMap(res -> populate(res.getT1(),res.getT2()));
+	  
+	  
+	  
+	 return res;
   }
 
  
@@ -57,7 +69,7 @@ public class CustomerController {
 
 
 
-private CustomerInfo populate(List<Customer> customerList, List<Product> productList) {
+private  CustomerInfo populate(List<Customer> customerList, List<Product> productList) {
 	// TODO Auto-generated method stub
 	
 	Iterator<Customer> customerIter = customerList.iterator();
@@ -70,13 +82,14 @@ private CustomerInfo populate(List<Customer> customerList, List<Product> product
 	  
 	  CustomerInfo info = new CustomerInfo();
 	  info.setCustomerProductList(customerProductList);
-	
+	 
 	return info;
+	//return Mono.just(info);
 }
 
 private CustomerProduct addCustomerProduct(Customer customer, List<Product> productList) {
 	// TODO Auto-generated method stub
-	System.out.println("inside iterateCustomer customer="+customer);
+	//System.out.println("inside iterateCustomer customer="+customer);
 	CustomerProduct customerProduct =new CustomerProduct();
 	customerProduct.setCustomerId(customer.getCustomerId());
 	customerProduct.setAddress(customer.getAddress());
@@ -86,8 +99,8 @@ private CustomerProduct addCustomerProduct(Customer customer, List<Product> prod
 	Iterator<String> iter = customer.getProductIdList().iterator();  
     while (iter.hasNext()) {
     	String productID=iter.next();
-    	System.out.println("productID="+productID);
-    	System.out.println("productList="+productList);
+    	//System.out.println("productID="+productID);
+    	//System.out.println("productList="+productList);
     	
     	{
     	  Iterator<Product> productIter = productList.iterator();
@@ -103,7 +116,7 @@ private CustomerProduct addCustomerProduct(Customer customer, List<Product> prod
     } 
     
     
-    System.out.println("custProductList=="+custProductList);
+    //System.out.println("custProductList=="+custProductList);
     customerProduct.setProductList(custProductList);
     
     
@@ -115,7 +128,7 @@ private CustomerProduct addCustomerProduct(Customer customer, List<Product> prod
 
 private boolean isProduct(String productID, Product product) {
 	// TODO Auto-generated method stub
-	System.out.println("isProduct");
+	//System.out.println("isProduct");
 	if(product.getId().equalsIgnoreCase(productID)) {
 		return true;
 	}

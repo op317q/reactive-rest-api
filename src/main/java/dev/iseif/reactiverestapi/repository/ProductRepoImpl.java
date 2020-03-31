@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.stereotype.Repository;
 
 import dev.iseif.reactiverestapi.model.Customer;
 import dev.iseif.reactiverestapi.model.Product;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Repository
 public class ProductRepoImpl implements ProductRepository {
@@ -51,11 +54,23 @@ public class ProductRepoImpl implements ProductRepository {
 	
 	@Override
 	public  Mono<List<Product>> findAll() {
+		
+		return Mono.defer(() -> {
 		// TODO Auto-generated method stub
-		System.out.println(this.productMap.values());
+		System.out.println("inside <Product>> findAll() going to sleep for 10 second");
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("inside <Product>> findAll() woke up after 10 second");
 		List<Product> prodList=new ArrayList<Product>();
 		prodList.addAll(this.productMap.values());
 		return Mono.just(prodList);
+		
+		}).subscribeOn(Schedulers.elastic());
 		
 	}
 

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 public class ProductService {
@@ -23,7 +24,11 @@ public class ProductService {
   }
 
   public Mono<List<Product>> getAll() {
-    return productRepository.findAll();
+   
+    
+   // return Mono.defer(() -> {
+    	 return productRepository.findAll();
+	//  }).subscribeOn(Schedulers.elastic());
   }
 
   public Mono<Product> getById(String id) {
